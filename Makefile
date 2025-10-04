@@ -8,10 +8,10 @@ help: ## Wyświetl pomoc
 build: ## Zbuduj obrazy Docker
 	docker-compose build
 
-start: ## Uruchom wszystkie usługi
-	docker-compose up -d
+up: ## Uruchom wszystkie usługi
+	docker-compose up --build
 
-stop: ## Zatrzymaj wszystkie usługi
+down: ## Zatrzymaj wszystkie usługi
 	docker-compose down
 
 restart: stop start ## Restart wszystkich usług

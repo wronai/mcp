@@ -43,4 +43,4 @@ Zobacz [CONTRIBUTING.md](docs/CONTRIBUTING.md) dla szczegółów.
 
 ## 📄 Licencja
 
-MIT License - zobacz [LICENSE](LICENSE) dla szczegółów.
+Apache Software License - zobacz [LICENSE](LICENSE) dla szczegółów.
