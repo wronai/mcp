@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  mcp-weather:
+    image: mcp-manager/weather-server:latest
+    container_name: mcp-weather
+    ports:
+      - "8007:8007"
+    environment:
+      - MCP_PORT=8007
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - DEFAULT_UNITS=metric
+    restart: unless-stopped

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mcp-database:
+    image: mcp-manager/database-server:latest
+    container_name: mcp-database
+    ports:
+      - "8003:8003"
+    environment:
+      - MCP_PORT=8003
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=mcp_data
+      - DB_USER=mcp_user
+      - DB_PASSWORD=secure_password
+      - MAX_QUERY_RESULTS=1000
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=mcp_data
+      - POSTGRES_USER=mcp_user
+      - POSTGRES_PASSWORD=secure_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

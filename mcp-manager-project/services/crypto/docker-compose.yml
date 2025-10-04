@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  mcp-crypto:
+    image: mcp-manager/crypto-server:latest
+    container_name: mcp-crypto
+    ports:
+      - "8010:8010"
+    environment:
+      - MCP_PORT=8010
+      - ETHERSCAN_API_KEY=${ETHERSCAN_API_KEY}
+      - INFURA_PROJECT_ID=${INFURA_PROJECT_ID}
+    restart: unless-stopped

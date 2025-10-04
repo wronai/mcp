@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  mcp-git:
+    image: mcp-manager/git-server:latest
+    container_name: mcp-git
+    ports:
+      - "8006:8006"
+    volumes:
+      - ~/.ssh:/root/.ssh:ro
+      - ./repos:/repos
+    environment:
+      - MCP_PORT=8006
+      - GIT_USER_NAME=MCP Bot
+      - GIT_USER_EMAIL=mcp@example.com
+    restart: unless-stopped

@@ -1,0 +1,173 @@
+version: '3.8'
+
+services:
+  # Core MCP Manager
+  mcp-manager:
+    build: .
+    container_name: mcp-manager-core
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://mcp:mcp123@postgres:5432/mcp_manager
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - mcp-network
+    restart: unless-stopped
+
+  # Ollama for AI
+  ollama:
+    image: ollama/ollama:latest
+    container_name: mcp-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - mcp-network
+    restart: unless-stopped
+
+  # All MCP Services
+  mcp-filesystem:
+    extends:
+      file: ./services/filesystem/docker-compose.yml
+      service: mcp-filesystem
+    networks:
+      - mcp-network
+
+  mcp-webscraper:
+    extends:
+      file: ./services/webscraper/docker-compose.yml
+      service: mcp-webscraper
+    networks:
+      - mcp-network
+
+  mcp-database:
+    extends:
+      file: ./services/database/docker-compose.yml
+      service: mcp-database
+    networks:
+      - mcp-network
+
+  mcp-python:
+    extends:
+      file: ./services/python-executor/docker-compose.yml
+      service: mcp-python
+    networks:
+      - mcp-network
+
+  mcp-email:
+    extends:
+      file: ./services/email/docker-compose.yml
+      service: mcp-email
+    networks:
+      - mcp-network
+
+  mcp-git:
+    extends:
+      file: ./services/git/docker-compose.yml
+      service: mcp-git
+    networks:
+      - mcp-network
+
+  mcp-weather:
+    extends:
+      file: ./services/weather/docker-compose.yml
+      service: mcp-weather
+    networks:
+      - mcp-network
+
+  mcp-docker:
+    extends:
+      file: ./services/docker-manager/docker-compose.yml
+      service: mcp-docker
+    networks:
+      - mcp-network
+
+  mcp-calendar:
+    extends:
+      file: ./services/calendar/docker-compose.yml
+      service: mcp-calendar
+    networks:
+      - mcp-network
+
+  mcp-crypto:
+    extends:
+      file: ./services/crypto/docker-compose.yml
+      service: mcp-crypto
+    networks:
+      - mcp-network
+
+  # Supporting Services
+  postgres:
+    image: postgres:15
+    container_name: mcp-postgres
+    environment:
+      - POSTGRES_USER=mcp
+      - POSTGRES_PASSWORD=mcp123
+      - POSTGRES_DB=mcp_manager
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mcp-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: mcp-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mcp-network
+    restart: unless-stopped
+
+  # Monitoring Stack
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: mcp-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - mcp-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: mcp-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=redis-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - mcp-network
+    restart: unless-stopped
+
+networks:
+  mcp-network:
+    driver: bridge
+
+volumes:
+  ollama_models:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:

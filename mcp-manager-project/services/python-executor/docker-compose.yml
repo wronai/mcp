@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  mcp-python:
+    image: mcp-manager/python-executor:latest
+    container_name: mcp-python
+    ports:
+      - "8004:8004"
+    environment:
+      - MCP_PORT=8004
+      - EXECUTION_TIMEOUT=30
+      - MAX_MEMORY=512M
+      - ALLOWED_MODULES=numpy,pandas,matplotlib,requests,beautifulsoup4
+    volumes:
+      - ./notebooks:/notebooks
+      - ./outputs:/outputs
+    restart: unless-stopped

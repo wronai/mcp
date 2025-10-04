@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  mcp-calendar:
+    image: mcp-manager/calendar-server:latest
+    container_name: mcp-calendar
+    ports:
+      - "8009:8009"
+    environment:
+      - MCP_PORT=8009
+      - CALDAV_URL=${CALDAV_URL}
+      - CALDAV_USER=${CALDAV_USER}
+      - CALDAV_PASS=${CALDAV_PASS}
+    restart: unless-stopped

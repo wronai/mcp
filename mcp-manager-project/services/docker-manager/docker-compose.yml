@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  mcp-docker:
+    image: mcp-manager/docker-server:latest
+    container_name: mcp-docker
+    ports:
+      - "8008:8008"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - MCP_PORT=8008
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    restart: unless-stopped

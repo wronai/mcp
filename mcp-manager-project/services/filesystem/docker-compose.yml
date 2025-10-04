@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  mcp-filesystem:
+    image: mcp-manager/filesystem-server:latest
+    container_name: mcp-filesystem
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./workspace:/workspace:rw
+      - ./config:/config:ro
+    environment:
+      - MCP_PORT=8001
+      - ALLOWED_PATHS=/workspace
+      - READ_ONLY=false
+      - MAX_FILE_SIZE=10MB
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  mcp-email:
+    image: mcp-manager/email-server:latest
+    container_name: mcp-email
+    ports:
+      - "8005:8005"
+    environment:
+      - MCP_PORT=8005
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=587
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - IMAP_HOST=${IMAP_HOST}
+      - IMAP_PORT=993
+    restart: unless-stopped

@@ -1,0 +1,69 @@
+# setup-mcp.sh
+
+echo "🚀 MCP Manager - Instalacja i konfiguracja"
+echo "=========================================="
+
+# Sprawdź Docker
+if ! command -v docker &> /dev/null; then
+    echo "❌ Docker nie jest zainstalowany. Instaluję..."
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sh get-docker.sh
+fi
+
+# Sprawdź Docker Compose
+if ! command -v docker-compose &> /dev/null; then
+    echo "❌ Docker Compose nie jest zainstalowany. Instaluję..."
+    sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+fi
+
+# Klonuj repozytorium
+echo "📦 Pobieram MCP Manager..."
+git clone https://github.com/mcp-manager/app.git mcp-manager
+cd mcp-manager
+
+# Konfiguracja środowiska
+echo "⚙️ Konfiguruję środowisko..."
+cp .env.example .env
+
+# Pytaj o usługi do włączenia
+echo "🎯 Które usługi chcesz włączyć?"
+echo "1) Podstawowe (Manager + Ollama)"
+echo "2) Rozszerzone (+ File, Web, Database)"
+echo "3) Pełne (Wszystkie usługi)"
+read -p "Wybierz opcję (1-3): " choice
+
+case $choice in
+    1)
+        docker-compose up -d mcp-manager ollama postgres redis
+        ;;
+    2)
+        docker-compose up -d mcp-manager ollama postgres redis \
+            mcp-filesystem mcp-webscraper mcp-database
+        ;;
+    3)
+        docker-compose -f docker-compose.all-services.yml up -d
+        ;;
+    *)
+        echo "Nieprawidłowa opcja"
+        exit 1
+        ;;
+esac
+
+# Pobierz modele Ollama
+echo "📥 Pobieram modele AI..."
+docker exec mcp-ollama ollama pull llama3.2
+docker exec mcp-ollama ollama pull codellama
+
+# Sprawdź status
+echo "✅ Sprawdzam status usług..."
+docker-compose ps
+
+echo ""
+echo "🎉 Instalacja zakończona!"
+echo "📍 Aplikacja dostępna pod adresem: http://localhost:3000"
+echo "📊 Monitoring (Grafana): http://localhost:3001"
+echo "🔐 Domyślne dane logowania: admin/admin123"
+echo ""
+echo "📚 Dokumentacja: https://github.com/mcp-manager/docs"
+echo "💬 Wsparcie: https://discord.gg/mcp-manager"

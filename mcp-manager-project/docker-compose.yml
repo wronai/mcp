@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  mcp-manager:
+    image: mcp-manager/app:latest
+    container_name: mcp-manager
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge

@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  mcp-webscraper:
+    image: mcp-manager/webscraper-server:latest
+    container_name: mcp-webscraper
+    ports:
+      - "8002:8002"
+    environment:
+      - MCP_PORT=8002
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
+      - RATE_LIMIT=10
+      - CACHE_TTL=3600
+    cap_add:
+      - SYS_ADMIN
+    restart: unless-stopped
