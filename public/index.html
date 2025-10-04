@@ -1,39 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCP Manager</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-top: 0;
-        }
-        .status {
-            color: #28a745;
-            font-weight: bold;
-        }
-    </style>
+    <title>MCP Manager - Centrum zarządzania</title>
+    <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
     <div class="container">
-        <h1>🚀 MCP Manager</h1>
-        <p class="status">✓ System Running</p>
-        <p>Welcome to the MCP Manager Platform</p>
+        <div class="header">
+            <h1>🚀 MCP Manager</h1>
+            <p>Centrum zarządzania serwerami i klientami Model Context Protocol</p>
+        </div>
+
+        <div class="dashboard">
+            <!-- Sidebar z listą usług -->
+            <div class="sidebar">
+                <h2>📡 Aktywne usługi</h2>
+                <div class="metrics">
+                    <div class="metric-card">
+                        <div class="metric-value" id="serverCount">0</div>
+                        <div class="metric-label">Serwery</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="clientCount">0</div>
+                        <div class="metric-label">Klienci</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="connectionCount">0</div>
+                        <div class="metric-label">Połączenia</div>
+                    </div>
+                </div>
+
+                <ul class="service-list" id="serviceList">
+                    <!-- Services will be loaded dynamically -->
+                </ul>
+
+                <button class="btn btn-primary" style="width: 100%;" onclick="showAddServiceModal()">
+                    + Dodaj nową usługę
+                </button>
+            </div>
+
+            <!-- Główna zawartość -->
+            <div class="main-content">
+                <h2 id="contentTitle">⚙️ Wybierz usługę</h2>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('config')">Konfiguracja</button>
+                    <button class="tab" onclick="switchTab('prompts')">Prompty</button>
+                    <button class="tab" onclick="switchTab('network')">Sieć</button>
+                    <button class="tab" onclick="switchTab('logs')">Logi</button>
+                    <button class="tab" onclick="switchTab('test')">Testowanie</button>
+                </div>
+
+                <div class="tab-content" id="config-tab">
+                    <div id="configContent"></div>
+                </div>
+
+                <div class="tab-content" id="prompts-tab" style="display: none;">
+                    <div id="promptsContent"></div>
+                </div>
+
+                <div class="tab-content" id="network-tab" style="display: none;">
+                    <div class="network-map" id="networkMap"></div>
+                </div>
+
+                <div class="tab-content" id="logs-tab" style="display: none;">
+                    <div id="logsContent"></div>
+                </div>
+
+                <div class="tab-content" id="test-tab" style="display: none;">
+                    <div id="testContent"></div>
+                </div>
+            </div>
+
+            <!-- Asystent AI -->
+            <div class="ai-assistant">
+                <h2>🤖 Asystent AI</h2>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-message ai">
+                            <div class="message-bubble">
+                                Cześć! Jestem Twoim asystentem MCP. Mogę pomóc Ci:
+                                <br><br>
+                                • Konfigurować serwery i klientów<br>
+                                • Tworzyć nowe usługi MCP<br>
+                                • Debugować połączenia<br>
+                                • Pisać i testować prompty<br>
+                                • Optymalizować wydajność<br><br>
+                                W czym mogę pomóc?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" class="form-control" placeholder="Zadaj pytanie..." id="chatInput" />
+                        <button class="btn btn-primary" onclick="sendMessage()">Wyślij</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3 style="font-size: 1.1em; margin-bottom: 10px;">Szybkie akcje:</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <button class="btn btn-primary btn-sm" onclick="quickAction('config')">
+                            📝 Generuj config
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="quickAction('debug')">
+                            🐛 Debug
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="quickAction('analyze')">
+                            📊 Analiza
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="quickAction('optimize')">
+                            🔧 Optymalizuj
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="floating-action" onclick="showAddServiceModal()">+</div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/app.js"></script>
 </body>
 </html>

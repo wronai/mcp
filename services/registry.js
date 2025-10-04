@@ -49,6 +49,51 @@ class MCPServiceRegistry {
     }
     return service;
   }
+  
+  updateService(serviceId, config) {
+    const service = this.services.get(serviceId);
+    if (!service) {
+      throw new Error(`Service ${serviceId} not found`);
+    }
+    
+    Object.assign(service, config);
+    service.updatedAt = new Date().toISOString();
+    this.services.set(serviceId, service);
+    return service;
+  }
+  
+  restartService(serviceId) {
+    const service = this.services.get(serviceId);
+    if (!service) {
+      throw new Error(`Service ${serviceId} not found`);
+    }
+    
+    service.status = 'pending';
+    setTimeout(() => {
+      service.status = 'active';
+      service.restartedAt = new Date().toISOString();
+    }, 2000);
+    
+    return service;
+  }
+  
+  async testService(serviceId, query) {
+    const service = this.services.get(serviceId);
+    if (!service) {
+      throw new Error(`Service ${serviceId} not found`);
+    }
+    
+    // Simulate test
+    return {
+      response: `Test successful for ${service.name}`,
+      status: 'ok',
+      serviceId: serviceId
+    };
+  }
+  
+  deleteService(serviceId) {
+    return this.services.delete(serviceId);
+  }
 }
 
 module.exports = new MCPServiceRegistry();

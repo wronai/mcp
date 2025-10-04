@@ -1,0 +1,62 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - heading "🚀 MCP Manager" [level=1] [ref=e4]
+      - paragraph [ref=e5]: Centrum zarządzania serwerami i klientami Model Context Protocol
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - heading "📡 Aktywne usługi" [level=2] [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]:
+            - generic [ref=e11]: "1"
+            - generic [ref=e12]: Serwery
+          - generic [ref=e13]:
+            - generic [ref=e14]: "1"
+            - generic [ref=e15]: Klienci
+          - generic [ref=e16]:
+            - generic [ref=e17]: "2"
+            - generic [ref=e18]: Połączenia
+        - list [ref=e19]:
+          - listitem [ref=e20] [cursor=pointer]:
+            - strong [ref=e22] [cursor=pointer]: test
+            - generic [ref=e23] [cursor=pointer]: http://localhost:8085 • server
+          - listitem [ref=e24] [cursor=pointer]:
+            - strong [ref=e26] [cursor=pointer]: dwa
+            - generic [ref=e27] [cursor=pointer]: http://localhost:8085 • client
+        - button "+ Dodaj nową usługę" [ref=e28] [cursor=pointer]
+      - generic [ref=e29]:
+        - heading "⚙️ Wybierz usługę" [level=2] [ref=e30]
+        - generic [ref=e31]:
+          - button "Konfiguracja" [ref=e32] [cursor=pointer]
+          - button "Prompty" [ref=e33] [cursor=pointer]
+          - button "Sieć" [ref=e34] [cursor=pointer]
+          - button "Logi" [ref=e35] [cursor=pointer]
+          - button "Testowanie" [ref=e36] [cursor=pointer]
+      - generic [ref=e37]:
+        - heading "🤖 Asystent AI" [level=2] [ref=e38]
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - generic [ref=e42]:
+              - text: "Cześć! Jestem Twoim asystentem MCP. Mogę pomóc Ci:"
+              - text: • Konfigurować serwery i klientów
+              - text: • Tworzyć nowe usługi MCP
+              - text: • Debugować połączenia
+              - text: • Pisać i testować prompty
+              - text: • Optymalizować wydajność
+              - text: W czym mogę pomóc?
+            - generic [ref=e44]: Jak dodać nowy serwer?
+          - generic [ref=e45]:
+            - textbox "Zadaj pytanie..." [ref=e46]
+            - button "Wyślij" [active] [ref=e47] [cursor=pointer]
+        - generic [ref=e48]:
+          - heading "Szybkie akcje:" [level=3] [ref=e49]
+          - generic [ref=e50]:
+            - button "📝 Generuj config" [ref=e51] [cursor=pointer]
+            - button "🐛 Debug" [ref=e52] [cursor=pointer]
+            - button "📊 Analiza" [ref=e53] [cursor=pointer]
+            - button "🔧 Optymalizuj" [ref=e54] [cursor=pointer]
+  - generic [ref=e55] [cursor=pointer]: +
+```

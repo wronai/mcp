@@ -6,6 +6,9 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+      - OLLAMA_URL=http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - mcp-network
 
