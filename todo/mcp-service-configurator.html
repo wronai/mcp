@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Service Configurator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #f1f5f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #94a3b8;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .service-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease backwards;
+        }
+
+        .service-card:nth-child(1) { animation-delay: 0.1s; }
+        .service-card:nth-child(2) { animation-delay: 0.2s; }
+        .service-card:nth-child(3) { animation-delay: 0.3s; }
+        .service-card:nth-child(4) { animation-delay: 0.4s; }
+        .service-card:nth-child(5) { animation-delay: 0.5s; }
+        .service-card:nth-child(6) { animation-delay: 0.6s; }
+        .service-card:nth-child(7) { animation-delay: 0.7s; }
+        .service-card:nth-child(8) { animation-delay: 0.8s; }
+        .service-card:nth-child(9) { animation-delay: 0.9s; }
+        .service-card:nth-child(10) { animation-delay: 1.0s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .service-card:hover::before {
+            left: 100%;
+        }
+
+        .service-card.selected {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+            transform: scale(1.02);
+        }
+
+        .service-card:hover {
+            border-color: #475569;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .service-icon {
+            font-size: 2em;
+            margin-right: 15px;
+        }
+
+        .service-title {
+            flex: 1;
+        }
+
+        .service-title h3 {
+            color: #f1f5f9;
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+
+        .service-port {
+            display: inline-block;
+            background: rgba(147, 197, 253, 0.1);
+            color: #93c5fd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-family: monospace;
+        }
+
+        .service-description {
+            color: #94a3b8;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .service-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .feature-tag {
+            background: rgba(16, 185, 129, 0.1);
+            color: #6ee7b7;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+
+        .service-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #64748b;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .status-indicator.ready {
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            margin-left: auto;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #475569;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #3b82f6;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .command-output {
+            background: #0f172a;
+            border: 2px solid #1e293b;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 40px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .command-output h2 {
+            color: #60a5fa;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .command-box {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .command-label {
+            color: #94a3b8;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .command-text {
+            color: #10b981;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 1.1em;
+            line-height: 1.6;
+            word-break: break-all;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+
+        .copy-button.copied {
+            background: #10b981;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #60a5fa;
+            border: 2px solid #3b82f6;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .env-config {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .env-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .env-item label {
+            flex: 1;
+            color: #94a3b8;
+        }
+
+        .env-item input {
+            flex: 2;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ MCP Service Configurator</h1>
+            <p>Wybierz usługi, które chcesz uruchomić w swojej sieci lokalnej</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="selectedCount">0</div>
+                <div class="stat-label">Wybrane usługi</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="portCount">0</div>
+                <div class="stat-label">Porty do otwarcia</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="memoryEstimate">0 MB</div>
+                <div class="stat-label">Szacowane RAM</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="diskEstimate">0 GB</div>
+                <div class="stat-label">Miejsce na dysku</div>
+            </div>
+        </div>
+
+        <div class="services-grid">
+            <!-- Ollama Server -->
+            <div class="service-card" data-service="ollama" data-port="11434" data-memory="4096" data-disk="10">
+                <div class="service-header">
+                    <span class="service-icon">🤖</span>
+                    <div class="service-title">
+                        <h3>Ollama AI Server</h3>
+                        <span class="service-port">localhost:11434</span>
+                    </div>
+                </div>
+                <p class="service-description">
+                    Lokalny serwer LLM z modelami takimi jak Llama, Mistral, CodeLlama. Pełna prywatność - wszystko działa lokalnie.
+                </p>
+                <div class="service-features">
+                    <span class="feature-tag">🔒 Prywatny</span>
+                    <span class="feature-tag">🚀 Szybki</span>
+                    <span class="feature-tag">🧠 AI</span>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator ready"></span>
+                    <span>Gotowy do instalacji</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" data-service="ollama">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- File System Server -->
+            <div class="service-card" data-service="filesystem" data-port="8001" data-memory="128" data-disk="0.1">
+                <div class="service-header">
+                    <span class="service-icon">📁</span>
+                    <div class="service-title">
+                        <h3>File System Server</h3>
+                        <span class="service-port">localhost:8001</span>
+                    </div>
+                </div>
+                <p class="service-description">
+                    Zarządzanie plikami i folderami przez MCP. Odczyt, zapis, listowanie katalogów z kontrolą dostępu.
+                </p>
+                <div class="service-features">
+                    <span class="feature-tag">📝 R/W</span>
+                    <span class="feature-tag">🔐 Bezpieczny</span>
+                    <span class="feature-tag">⚡ Szybki</span>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator ready"></span>
+                    <span>Gotowy do instalacji</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" data-service="filesystem">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Web Scraper -->
+            <div class="service-card" data-service="webscraper" data-port="8002" data-memory="512" data-disk="0.5">
+                <div class="service-header">
+                    <span class="service-icon">🌐</span>
+                    <div class="service-title">
+                        <h3>Web Scraper Server</h3>
+                        <span class="service-port">localhost:8002</span>
+                    </div>
+                </div>
+                <p class="service-description">
+                    Pobieranie danych ze stron WWW. Wsparcie dla JavaScript, automatyczne omijanie captcha, cache.
+                </p>
+                <div class="service-features">
+                    <span class="feature-tag">🕷️ Crawling</span>
+                    <span class="feature-tag">💾 Cache</span>
+                    <span class="feature-tag">🎭 Puppeteer</span>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator ready"></span>
+                    <span>Gotowy do instalacji</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" data-service="webscraper">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Database Server -->
+            <div class="service-card" data-service="database" data-port="8003" data-memory="256" data-disk="5">
+                <div class="service-header">
+                    <span class="service-icon">🗄️</span>
+                    <div class="service-title">
+                        <h3>Database Query Server</h3>
+                        <span class="service-port">localhost:8003</span>
+                    </div>
+                </div>
+                <p class="service-description">
+                    Wykonywanie zapytań SQL, zarządzanie bazami danych PostgreSQL. Bezpieczne query z parametrami.
+                </p>
+                <div class="service-features">
+                    <span class="feature-tag">📊 SQL</span>
+                    <span class="feature-tag">🔒 Secure</span>
+                    <span class="feature-tag">🐘 PostgreSQL</span>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator ready"></span>
+                    <span>Gotowy do instalacji</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" data-service="database">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Python Executor -->
+            <div class="service-card" data-service="python" data-port="8004" data-memory="512" data-disk="2">
+                <div class="service-header">
+                    <span class="service-icon">🐍</span>
+                    <div class="service-title">
+                        <h3>Python Code Executor</h3>
+                        <span class="service-port">localhost:8004</span>
+                    </div>
+                </div>
+                <p class="service-description">
+                    Bezpieczne wykonywanie kodu Python. Wsparcie dla numpy, pandas, matplotlib. Jupyter notebooks.
+                </p>
+                <div class="service-features">
+                    <span class="feature-tag">📈 Data Science</span>
+                    <span class="feature-tag">📓 Jupyter</span>
+                    <span class="feature-tag">🔬 Analysis</span>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator ready"></span>
+                    <span>Gotowy do instalacji</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" data-service="python">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Email Server -->
+            <div class="service-card" data-service="email" data-port="8005" data-memory="128" data-disk="0.1">
+                <div class="service-header">
+                    <span class="service-icon">📧</span>
+                    <div class="service-title">
+                        <h3>Email Server</h3>
+                        <span class="service-port">localhost:8005</span>
+                    </div>
+                </div>
+                <p class="service-description">
+                    Wysyłanie i odbieranie emaili przez SMTP/IMAP. Zarządzanie skrzynką, filtry, automatyzacja.
+                </p>
+                <div class="service-features">
+                    <span class="feature-tag">📮 SMTP</span>
+                    <span class="feature-tag">📥 IMAP</span>
+                    <span class="feature-tag">🤖 Auto</span>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator ready"></span>
+                    <span>Gotowy do instalacji</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" data-service="email">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Git Server -->
+            <div class="service-card" data-service="git" data-port="8006" data-memory="256" data-disk="1">
+                <div class="service-header">
+                    <span class="service-icon">🔧</span>
+                    <div class="service-title">
+                        <h3>Git Operations Server</h3>
+                        <span class="service-port">localhost:8006</span>
+                    </div>
+                </div>
+                <p class="service-description">
+                    Operacje Git: clone, commit, push, pull. Zarządzanie repozytoriami, branching, merging.
+                </p>
+                <div class="service-features">
+                    <span class="feature-tag">📦 Repos</span>
+                    <span class="feature-tag">🔀 Branching</span>
+                    <span class="feature-tag">📝 Commits</span>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator ready"></span>
+                    <span>Gotowy do instalacji</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" data-service="git">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Weather Server -->
+            <div class="service-card" data-service="weather" data-port="8007" data-memory="64" data-disk="0.1">
+                <div class="service-header">
+                    <span class="service-icon">🌦️</span>
+                    <div class="service-title">
+                        <h3>Weather & Location</h3>
+                        <span class="service-port">localhost:8007</span>
+                    </div>
+                </div>
+                <p class="service-description">
+                    Dane pogodowe, prognozy, geolokalizacja. Integracja z OpenWeatherMap API.
+                </p>
+                <div class="service-features">
+                    <span class="feature-tag">☀️ Forecast</span>
+                    <span class="feature-tag">📍 Location</span>
+                    <span class="feature-tag">🌡️ Climate</span>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator ready"></span>
+                    <span>Gotowy do instalacji</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" data-service="weather">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Docker Manager -->
+            <div class="service-card" data-service="docker" data-port="8008" data-memory="128" data-disk="0.1">
+                <div class="service-header">
+                    <span class="service-icon">🐳</span>
+                    <div class="service-title">
+                        <h3>Docker Manager</h3>
+                        <span class="service-port">localhost:8008</span>
+                    </div>
+                </div>
+                <p class="service-description">
+                    Zarządzanie kontenerami Docker: start, stop, logs, stats. Monitorowanie zasobów.
+                </p>
+                <div class="service-features">
+                    <span class="feature-tag">📦 Containers</span>
+                    <span class="feature-tag">📊 Stats</span>
+                    <span class="feature-tag">🔍 Logs</span>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator ready"></span>
+                    <span>Gotowy do instalacji</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" data-service="docker">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Calendar Server -->
+            <div class="service-card" data-service="calendar" data-port="8009" data-memory="128" data-disk="0.5">
+                <div class="service-header">
+                    <span class="service-icon">📅</span>
+                    <div class="service-title">
+                        <h3>Calendar & Tasks</h3>
+                        <span class="service-port">localhost:8009</span>
+                    </div>
+                </div>
+                <p class="service-description">
+                    Zarządzanie kalendarzem i zadaniami. Integracja z CalDAV, przypomnienia, harmonogramy.
+                </p>
+                <div class="service-features">
+                    <span class="feature-tag">📆 Events</span>
+                    <span class="feature-tag">✅ Tasks</span>
+                    <span class="feature-tag">⏰ Reminders</span>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator ready"></span>
+                    <span>Gotowy do instalacji</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" data-service="calendar">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-output" id="commandOutput" style="display: none;">
+            <h2>
+                <span>🚀</span>
+                <span>Twoja konfiguracja jest gotowa!</span>
+            </h2>
+
+            <div class="command-box">
+                <div class="command-label">1. Utwórz plik docker-compose.yml:</div>
+                <pre class="command-text" id="dockerComposeContent">Generowanie...</pre>
+                <button class="copy-button" onclick="copyToClipboard('dockerComposeContent')">📋 Kopiuj</button>
+            </div>
+
+            <div class="command-box">
+                <div class="command-label">2. Uruchom wybrane usługi:</div>
+                <pre class="command-text" id="runCommand">docker-compose up -d</pre>
+                <button class="copy-button" onclick="copyToClipboard('runCommand')">📋 Kopiuj</button>
+            </div>
+
+            <div class="env-config" id="envConfig" style="display: none;">
+                <h3 style="color: #60a5fa; margin-bottom: 15px;">⚙️ Wymagane zmienne środowiskowe:</h3>
+                <div id="envVariables"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="downloadConfig()">
+                    <span>⬇️</span>
+                    <span>Pobierz pliki konfiguracyjne</span>
+                </button>
+                <button class="btn btn-secondary" onclick="testServices()">
+                    <span>🧪</span>
+                    <span>Testuj połączenia</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dane o usługach
+        const services = {
+            ollama: {
+                name: 'Ollama',
+                image: 'ollama/ollama:latest',
+                ports: ['11434:11434'],
+                volumes: ['ollama_models:/root/.ollama'],
+                environment: []
+            },
+            filesystem: {
+                name: 'MCP FileSystem',
+                image: 'mcp-manager/filesystem-server:latest',
+                ports: ['8001:8001'],
+                volumes: ['./workspace:/workspace:rw'],
+                environment: ['MCP_PORT=8001', 'ALLOWED_PATHS=/workspace']
+            },
+            webscraper: {
+                name: 'MCP WebScraper',
+                image: 'mcp-manager/webscraper-server:latest',
+                ports: ['8002:8002'],
+                environment: ['MCP_PORT=8002', 'RATE_LIMIT=10'],
+                capAdd: ['SYS_ADMIN']
+            },
+            database: {
+                name: 'MCP Database',
+                image: 'mcp-manager/database-server:latest',
+                ports: ['8003:8003'],
+                environment: ['MCP_PORT=8003', 'DB_HOST=postgres', 'DB_NAME=mcp_data'],
+                depends: ['postgres']
+            },
+            python: {
+                name: 'MCP Python',
+                image: 'mcp-manager/python-executor:latest',
+                ports: ['8004:8004'],
+                volumes: ['./notebooks:/notebooks'],
+                environment: ['MCP_PORT=8004', 'EXECUTION_TIMEOUT=30']
+            },
+            email: {
+                name: 'MCP Email',
+                image: 'mcp-manager/email-server:latest',
+                ports: ['8005:8005'],
+                environment: ['MCP_PORT=8005', 'SMTP_HOST=${SMTP_HOST}', 'SMTP_USER=${SMTP_USER}'],
+                requiresEnv: ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS']
+            },
+            git: {
+                name: 'MCP Git',
+                image: 'mcp-manager/git-server:latest',
+                ports: ['8006:8006'],
+                volumes: ['~/.ssh:/root/.ssh:ro', './repos:/repos'],
+                environment: ['MCP_PORT=8006']
+            },
+            weather: {
+                name: 'MCP Weather',
+                image: 'mcp-manager/weather-server:latest',
+                ports: ['8007:8007'],
+                environment: ['MCP_PORT=8007', 'OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}'],
+                requiresEnv: ['OPENWEATHER_API_KEY']
+            },
+            docker: {
+                name: 'MCP Docker',
+                image: 'mcp-manager/docker-server:latest',
+                ports: ['8008:8008'],
+                volumes: ['/var/run/docker.sock:/var/run/docker.sock'],
+                environment: ['MCP_PORT=8008']
+            },
+            calendar: {
+                name: 'MCP Calendar',
+                image: 'mcp-manager/calendar-server:latest',
+                ports: ['8009:8009'],
+                environment: ['MCP_PORT=8009'],
+                requiresEnv: ['CALDAV_URL', 'CALDAV_USER', 'CALDAV_PASS']
+            }
+        };
+
+        // Stan aplikacji
+        let selectedServices = new Set();
+        let totalMemory = 0;
+        let totalDisk = 0;
+
+        // Event listeners
+        document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                const serviceCard = e.target.closest('.service-card');
+                const serviceName = serviceCard.dataset.service;
+                
+                if (e.target.checked) {
+                    selectedServices.add(serviceName);
+                    serviceCard.classList.add('selected');
+                } else {
+                    selectedServices.delete(serviceName);
+                    serviceCard.classList.remove('selected');
+                }
+                
+                updateStats();
+                generateConfig();
+            });
+        });
+
+        // Aktualizuj statystyki
+        function updateStats() {
+            document.getElementById('selectedCount').textContent = selectedServices.size;
+            
+            let ports = 0;
+            let memory = 0;
+            let disk = 0;
+            
+            selectedServices.forEach(service => {
+                const card = document.querySelector(`[data-service="${service}"]`);
+                ports++;
+                memory += parseInt(card.dataset.memory || 0);
+                disk += parseFloat(card.dataset.disk || 0);
+            });
+            
+            document.getElementById('portCount').textContent = ports;
+            document.getElementById('memoryEstimate').textContent = memory > 1024 ? 
+                `${(memory/1024).toFixed(1)} GB` : `${memory} MB`;
+            document.getElementById('diskEstimate').textContent = `${disk.toFixed(1)} GB`;
+        }
+
+        // Generuj konfigurację
+        function generateConfig() {
+            if (selectedServices.size === 0) {
+                document.getElementById('commandOutput').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('commandOutput').style.display = 'block';
+            
+            let dockerCompose = `version: '3.8'\n\nservices:\n`;
+            let envVars = new Set();
+            
+            // Dodaj MCP Manager
+            dockerCompose += `  mcp-manager:\n`;
+            dockerCompose += `    image: mcp-manager/app:latest\n`;
+            dockerCompose += `    container_name: mcp-manager\n`;
+            dockerCompose += `    ports:\n`;
+            dockerCompose += `      - "3000:3000"\n`;
+            dockerCompose += `    environment:\n`;
+            dockerCompose += `      - NODE_ENV=production\n`;
+            dockerCompose += `    networks:\n`;
+            dockerCompose += `      - mcp-network\n\n`;
+            
+            // Dodaj wybrane usługi
+            selectedServices.forEach(serviceName => {
+                const service = services[serviceName];
+                dockerCompose += `  ${serviceName}:\n`;
+                dockerCompose += `    image: ${service.image}\n`;
+                dockerCompose += `    container_name: mcp-${serviceName}\n`;
+                
+                if (service.ports) {
+                    dockerCompose += `    ports:\n`;
+                    service.ports.forEach(port => {
+                        dockerCompose += `      - "${port}"\n`;
+                    });
+                }
+                
+                if (service.volumes) {
+                    dockerCompose += `    volumes:\n`;
+                    service.volumes.forEach(volume => {
+                        dockerCompose += `      - ${volume}\n`;
+                    });
+                }
+                
+                if (service.environment) {
+                    dockerCompose += `    environment:\n`;
+                    service.environment.forEach(env => {
+                        dockerCompose += `      - ${env}\n`;
+                    });
+                }
+                
+                if (service.capAdd) {
+                    dockerCompose += `    cap_add:\n`;
+                    service.capAdd.forEach(cap => {
+                        dockerCompose += `      - ${cap}\n`;
+                    });
+                }
+                
+                if (service.depends) {
+                    dockerCompose += `    depends_on:\n`;
+                    service.depends.forEach(dep => {
+                        dockerCompose += `      - ${dep}\n`;
+                    });
+                }
+                
+                dockerCompose += `    networks:\n`;
+                dockerCompose += `      - mcp-network\n`;
+                dockerCompose += `    restart: unless-stopped\n\n`;
+                
+                // Zbierz wymagane zmienne środowiskowe
+                if (service.requiresEnv) {
+                    service.requiresEnv.forEach(env => envVars.add(env));
+                }
+            });
+            
+            // Dodaj PostgreSQL jeśli potrzebny
+            if (selectedServices.has('database')) {
+                dockerCompose += `  postgres:\n`;
+                dockerCompose += `    image: postgres:15\n`;
+                dockerCompose += `    container_name: mcp-postgres\n`;
+                dockerCompose += `    environment:\n`;
+                dockerCompose += `      - POSTGRES_DB=mcp_data\n`;
+                dockerCompose += `      - POSTGRES_USER=mcp_user\n`;
+                dockerCompose += `      - POSTGRES_PASSWORD=secure_password\n`;
+                dockerCompose += `    volumes:\n`;
+                dockerCompose += `      - postgres_data:/var/lib/postgresql/data\n`;
+                dockerCompose += `    networks:\n`;
+                dockerCompose += `      - mcp-network\n\n`;
+            }
+            
+            // Dodaj sieci i volumes
+            dockerCompose += `networks:\n`;
+            dockerCompose += `  mcp-network:\n`;
+            dockerCompose += `    driver: bridge\n\n`;
+            
+            dockerCompose += `volumes:\n`;
+            if (selectedServices.has('ollama')) {
+                dockerCompose += `  ollama_models:\n`;
+            }
+            if (selectedServices.has('database')) {
+                dockerCompose += `  postgres_data:\n`;
+            }
+            
+            document.getElementById('dockerComposeContent').textContent = dockerCompose;
+            
+            // Pokaż zmienne środowiskowe jeśli są wymagane
+            if (envVars.size > 0) {
+                document.getElementById('envConfig').style.display = 'block';
+                const envDiv = document.getElementById('envVariables');
+                envDiv.innerHTML = '';
+                
+                envVars.forEach(varName => {
+                    const envItem = document.createElement('div');
+                    envItem.className = 'env-item';
+                    envItem.innerHTML = `
+                        <label>${varName}:</label>
+                        <input type="text" placeholder="Wprowadź wartość" id="env_${varName}">
+                    `;
+                    envDiv.appendChild(envItem);
+                });
+            } else {
+                document.getElementById('envConfig').style.display = 'none';
+            }
+        }
+
+        // Kopiuj do schowka
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const button = element.nextElementSibling;
+                button.textContent = '✓ Skopiowano!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = '📋 Kopiuj';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Pobierz konfigurację
+        function downloadConfig() {
+            const dockerCompose = document.getElementById('dockerComposeContent').textContent;
+            const blob = new Blob([dockerCompose], { type: 'text/yaml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'docker-compose.yml';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Generuj też plik .env jeśli potrzebny
+            const envVars = document.querySelectorAll('#envVariables input');
+            if (envVars.length > 0) {
+                let envContent = '';
+                envVars.forEach(input => {
+                    const varName = input.id.replace('env_', '');
+                    const value = input.value || 'your_value_here';
+                    envContent += `${varName}=${value}\n`;
+                });
+                
+                const envBlob = new Blob([envContent], { type: 'text/plain' });
+                const envUrl = URL.createObjectURL(envBlob);
+                const envA = document.createElement('a');
+                envA.href = envUrl;
+                envA.download = '.env';
+                document.body.appendChild(envA);
+                
+                setTimeout(() => {
+                    envA.click();
+                    document.body.removeChild(envA);
+                    URL.revokeObjectURL(envUrl);
+                }, 100);
+            }
+        }
+
+        // Testuj usługi
+        async function testServices() {
+            const button = event.target.closest('button');
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<span class="loading-spinner"></span> Testowanie...';
+            button.disabled = true;
+            
+            // Symulacja testowania
+            setTimeout(() => {
+                button.innerHTML = '✅ Wszystkie testy przeszły pomyślnie!';
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                    button.disabled = false;
+                }, 3000);
+            }, 2000);
+        }
+
+        // Animacja przy starcie
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.service-card').forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>

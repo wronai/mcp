@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Manager - Centrum zarządzania</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            color: var(--dark);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1.1em;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 30px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .sidebar, .main-content, .ai-assistant {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar h2, .main-content h2, .ai-assistant h2 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .service-list {
+            list-style: none;
+        }
+
+        .service-item {
+            background: var(--light);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-item:hover {
+            transform: translateX(5px);
+            border-color: var(--primary);
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .service-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .service-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .status-online {
+            background: var(--secondary);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .status-offline {
+            background: var(--danger);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .status-pending {
+            background: var(--warning);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .config-section {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .config-section h3 {
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--dark);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-success {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, var(--light), white);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #64748b;
+            font-size: 0.9em;
+        }
+
+        .chat-container {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-message.user {
+            text-align: right;
+        }
+
+        .chat-message.ai {
+            text-align: left;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .user .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai .message-bubble {
+            background: #e2e8f0;
+            color: var(--dark);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+        }
+
+        .network-map {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 20px;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .node {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .node:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+
+        .connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform-origin: left center;
+            opacity: 0.5;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: var(--dark);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            white-space: nowrap;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .floating-action:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 MCP Manager</h1>
+            <p>Centrum zarządzania serwerami i klientami Model Context Protocol</p>
+        </div>
+
+        <div class="dashboard">
+            <!-- Sidebar z listą usług -->
+            <div class="sidebar">
+                <h2>📡 Aktywne usługi</h2>
+                <div class="metrics">
+                    <div class="metric-card">
+                        <div class="metric-value">5</div>
+                        <div class="metric-label">Serwery</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">3</div>
+                        <div class="metric-label">Klienci</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">Połączenia</div>
+                    </div>
+                </div>
+
+                <ul class="service-list">
+                    <li class="service-item active">
+                        <span class="service-status status-online"></span>
+                        <strong>Ollama Server</strong>
+                        <div style="font-size: 0.85em; color: #64748b; margin-top: 5px;">
+                            localhost:11434 • llama3.2
+                        </div>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-status status-online"></span>
+                        <strong>MCP File Server</strong>
+                        <div style="font-size: 0.85em; color: #64748b; margin-top: 5px;">
+                            localhost:8080 • File operations
+                        </div>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-status status-pending"></span>
+                        <strong>MCP Web Search</strong>
+                        <div style="font-size: 0.85em; color: #64748b; margin-top: 5px;">
+                            localhost:8081 • Connecting...
+                        </div>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-status status-offline"></span>
+                        <strong>MCP Database</strong>
+                        <div style="font-size: 0.85em; color: #64748b; margin-top: 5px;">
+                            localhost:5432 • Offline
+                        </div>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-status status-online"></span>
+                        <strong>Claude Desktop</strong>
+                        <div style="font-size: 0.85em; color: #64748b; margin-top: 5px;">
+                            Client • Connected
+                        </div>
+                    </li>
+                </ul>
+
+                <button class="btn btn-primary" style="width: 100%;">
+                    + Dodaj nową usługę
+                </button>
+            </div>
+
+            <!-- Główna zawartość -->
+            <div class="main-content">
+                <h2>⚙️ Konfiguracja: Ollama Server</h2>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('config')">Konfiguracja</button>
+                    <button class="tab" onclick="switchTab('prompts')">Prompty</button>
+                    <button class="tab" onclick="switchTab('network')">Sieć</button>
+                    <button class="tab" onclick="switchTab('logs')">Logi</button>
+                    <button class="tab" onclick="switchTab('test')">Testowanie</button>
+                </div>
+
+                <div class="tab-content" id="config-tab">
+                    <div class="config-section">
+                        <h3>Podstawowe ustawienia</h3>
+                        <div class="form-group">
+                            <label>Nazwa serwera</label>
+                            <input type="text" class="form-control" value="Ollama Server" />
+                        </div>
+                        <div class="form-group">
+                            <label>Endpoint URL</label>
+                            <input type="text" class="form-control" value="http://localhost:11434" />
+                        </div>
+                        <div class="form-group">
+                            <label>Model</label>
+                            <select class="form-control">
+                                <option>llama3.2</option>
+                                <option>mistral</option>
+                                <option>codellama</option>
+                                <option>phi3</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h3>Zaawansowane parametry</h3>
+                        <div class="form-group">
+                            <label>Temperatura</label>
+                            <input type="range" class="form-control" min="0" max="2" step="0.1" value="0.7" />
+                        </div>
+                        <div class="form-group">
+                            <label>Max Tokens</label>
+                            <input type="number" class="form-control" value="4096" />
+                        </div>
+                        <div class="form-group">
+                            <label>Timeout (ms)</label>
+                            <input type="number" class="form-control" value="30000" />
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-success">💾 Zapisz zmiany</button>
+                        <button class="btn btn-danger">🔄 Restart serwera</button>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="prompts-tab" style="display: none;">
+                    <div class="config-section">
+                        <h3>System Prompt</h3>
+                        <div class="form-group">
+                            <textarea class="form-control" rows="8">You are a helpful AI assistant integrated with MCP (Model Context Protocol). You have access to various tools and services through the MCP interface. Always be precise and helpful in your responses.</textarea>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h3>Szablony promptów</h3>
+                        <div class="form-group">
+                            <label>Wybierz szablon</label>
+                            <select class="form-control">
+                                <option>Asystent programisty</option>
+                                <option>Analityk danych</option>
+                                <option>Dokumentacja techniczna</option>
+                                <option>Debugger kodu</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary">Zastosuj szablon</button>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="network-tab" style="display: none;">
+                    <div class="network-map" id="networkMap">
+                        <div class="connection" style="width: 150px; left: 80px; top: 80px; transform: rotate(45deg);"></div>
+                        <div class="connection" style="width: 150px; left: 80px; top: 80px; transform: rotate(-45deg);"></div>
+                        <div class="connection" style="width: 150px; left: 250px; top: 80px; transform: rotate(135deg);"></div>
+                        
+                        <div class="node" style="left: 50px; top: 50px;">MCP</div>
+                        <div class="node" style="left: 150px; top: 150px;">File</div>
+                        <div class="node" style="left: 250px; top: 50px;">LLM</div>
+                        <div class="node" style="left: 150px; top: 30px;">Web</div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="test-tab" style="display: none;">
+                    <div class="config-section">
+                        <h3>Test połączenia</h3>
+                        <div class="form-group">
+                            <label>Test Query</label>
+                            <input type="text" class="form-control" placeholder="Wpisz zapytanie testowe..." value="Hello, are you working?" />
+                        </div>
+                        <button class="btn btn-primary">🧪 Uruchom test</button>
+                        
+                        <div style="margin-top: 20px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 2px solid #22c55e;">
+                            <strong style="color: #22c55e;">✓ Test zakończony pomyślnie!</strong>
+                            <div style="margin-top: 10px; font-family: monospace; font-size: 0.9em;">
+                                Response: "Yes, I'm working correctly! How can I help you today?"<br>
+                                Latency: 124ms<br>
+                                Model: llama3.2
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asystent AI -->
+            <div class="ai-assistant">
+                <h2>🤖 Asystent AI</h2>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-message ai">
+                            <div class="message-bubble">
+                                Cześć! Jestem Twoim asystentem MCP. Mogę pomóc Ci:
+                                <br><br>
+                                • Konfigurować serwery i klientów<br>
+                                • Tworzyć nowe usługi MCP<br>
+                                • Debugować połączenia<br>
+                                • Pisać i testować prompty<br>
+                                • Optymalizować wydajność<br><br>
+                                W czym mogę pomóc?
+                            </div>
+                        </div>
+                        <div class="chat-message user">
+                            <div class="message-bubble">
+                                Jak mogę dodać nowy serwer MCP do systemu?
+                            </div>
+                        </div>
+                        <div class="chat-message ai">
+                            <div class="message-bubble">
+                                Aby dodać nowy serwer MCP:<br><br>
+                                1. Kliknij "Dodaj nową usługę" w panelu bocznym<br>
+                                2. Wybierz typ serwera (np. File, Database, API)<br>
+                                3. Wprowadź endpoint URL i parametry połączenia<br>
+                                4. Skonfiguruj prompty systemowe<br>
+                                5. Przetestuj połączenie<br><br>
+                                Chcesz, żebym przeprowadził Cię przez ten proces krok po kroku?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" class="form-control" placeholder="Zadaj pytanie..." id="chatInput" />
+                        <button class="btn btn-primary" onclick="sendMessage()">Wyślij</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3 style="font-size: 1.1em; margin-bottom: 10px;">Szybkie akcje:</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <button class="btn btn-primary" style="padding: 8px 12px; font-size: 0.9em;">
+                            📝 Generuj config
+                        </button>
+                        <button class="btn btn-primary" style="padding: 8px 12px; font-size: 0.9em;">
+                            🐛 Debug
+                        </button>
+                        <button class="btn btn-primary" style="padding: 8px 12px; font-size: 0.9em;">
+                            📊 Analiza
+                        </button>
+                        <button class="btn btn-primary" style="padding: 8px 12px; font-size: 0.9em;">
+                            🔧 Optymalizuj
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-action">+</div>
+
+    <script>
+        // Funkcje interaktywne
+        function switchTab(tabName) {
+            // Ukryj wszystkie zakładki
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Usuń aktywną klasę ze wszystkich przycisków
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Pokaż wybraną zakładkę
+            const selectedTab = document.getElementById(tabName + '-tab');
+            if (selectedTab) {
+                selectedTab.style.display = 'block';
+            }
+            
+            // Oznacz przycisk jako aktywny
+            event.target.classList.add('active');
+        }
+
+        // Obsługa kliknięć na usługi
+        document.querySelectorAll('.service-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Usuń aktywną klasę ze wszystkich
+                document.querySelectorAll('.service-item').forEach(service => {
+                    service.classList.remove('active');
+                });
+                // Dodaj aktywną klasę do klikniętego
+                this.classList.add('active');
+                
+                // Aktualizuj tytuł głównej zawartości
+                const serviceName = this.querySelector('strong').textContent;
+                document.querySelector('.main-content h2').textContent = `⚙️ Konfiguracja: ${serviceName}`;
+            });
+        });
+
+        // Funkcja wysyłania wiadomości w czacie
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const messages = document.getElementById('chatMessages');
+            
+            if (input.value.trim() === '') return;
+            
+            // Dodaj wiadomość użytkownika
+            const userMessage = document.createElement('div');
+            userMessage.className = 'chat-message user';
+            userMessage.innerHTML = `<div class="message-bubble">${input.value}</div>`;
+            messages.appendChild(userMessage);
+            
+            // Symulacja odpowiedzi AI
+            setTimeout(() => {
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'chat-message ai';
+                aiMessage.innerHTML = `<div class="message-bubble">Analizuję Twoje zapytanie... To świetne pytanie! Przygotowuję dla Ciebie szczegółową odpowiedź.</div>`;
+                messages.appendChild(aiMessage);
+                messages.scrollTop = messages.scrollHeight;
+            }, 1000);
+            
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // Enter w czacie
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Animacja połączeń sieciowych
+        let connectionAnimation = setInterval(() => {
+            const connections = document.querySelectorAll('.connection');
+            connections.forEach(conn => {
+                conn.style.opacity = Math.random() * 0.5 + 0.5;
+            });
+        }, 1000);
+
+        // Symulacja zmiany statusów
+        setInterval(() => {
+            const statuses = document.querySelectorAll('.service-status');
+            const randomIndex = Math.floor(Math.random() * statuses.length);
+            const status = statuses[randomIndex];
+            
+            if (status.classList.contains('status-offline')) {
+                status.className = 'service-status status-pending';
+            } else if (status.classList.contains('status-pending')) {
+                status.className = 'service-status status-online';
+            }
+        }, 5000);
+
+        // Hover efekt na nodes w network map
+        document.querySelectorAll('.node').forEach(node => {
+            node.addEventListener('mouseenter', function(e) {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip show';
+                tooltip.textContent = `${this.textContent} Server - Active`;
+                tooltip.style.left = e.pageX + 'px';
+                tooltip.style.top = (e.pageY - 40) + 'px';
+                document.body.appendChild(tooltip);
+            });
+            
+            node.addEventListener('mouseleave', function() {
+                document.querySelectorAll('.tooltip').forEach(t => t.remove());
+            });
+        });
+
+        // Floating action button
+        document.querySelector('.floating-action').addEventListener('click', function() {
+            alert('Kreator nowego serwera MCP - funkcja w przygotowaniu!');
+        });
+    </script>
+</body>
+</html>
